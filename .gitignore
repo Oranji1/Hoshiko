@@ -3,5 +3,6 @@ __pycache__/
 
 .vscode/
 
+config.json
 .env
 .venv/
