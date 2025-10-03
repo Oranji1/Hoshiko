@@ -21,6 +21,7 @@ intents.moderation = False
 intents.members = True
 intents.reactions = False
 
+
 class Hoshiko(commands.Bot):
     def __init__(self) -> None:
         super().__init__(
@@ -45,10 +46,3 @@ class Hoshiko(commands.Bot):
 
     async def start(self) -> None:
         await super().start(token=self.config["bot"]["token"], reconnect=True)
-
-bot = Hoshiko()
-
-bot.config = config
-
-def run_bot():
-    bot.run(TOKEN)
