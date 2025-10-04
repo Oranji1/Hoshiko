@@ -1,6 +1,6 @@
 import json
 import os
-
+import jishaku
 import discord
 from discord.ext import commands
 
@@ -21,6 +21,8 @@ intents.moderation = False
 intents.members = True
 intents.reactions = False
 
+jishaku.Flags.NO_DM_TRACEBACK = True
+jishaku.Flags.NO_UNDERSCORE = True
 
 class Hoshiko(commands.Bot):
     def __init__(self) -> None:
@@ -42,6 +44,7 @@ class Hoshiko(commands.Bot):
                     raise e
 
     async def setup_hook(self) -> None:
+        await self.load_extension("jishaku")
         await self.load_cogs()
 
     async def start(self) -> None:
