@@ -1,7 +1,8 @@
 import json
 import os
-import jishaku
+
 import discord
+import jishaku
 from discord.ext import commands
 
 with open(f"{os.getcwd()}/config.json", encoding="utf-8") as file:
@@ -23,6 +24,7 @@ intents.reactions = False
 
 jishaku.Flags.NO_DM_TRACEBACK = True
 jishaku.Flags.NO_UNDERSCORE = True
+
 
 class Hoshiko(commands.Bot):
     def __init__(self) -> None:
