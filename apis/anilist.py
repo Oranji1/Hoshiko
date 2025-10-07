@@ -15,7 +15,6 @@ async def search_anime(query: str) -> dict:
                 coverImage {
                     large
                 }
-                description
                 format
                 episodes
                 source
