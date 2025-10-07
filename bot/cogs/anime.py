@@ -21,7 +21,9 @@ class AnimeCog(commands.Cog):
         await ctx.send(f"Searching for {anime}...")
         anime = await search(anime)
 
-        embed = discord.Embed(title=anime["title"]['romaji'], description=anime["synopsis"])
+        embed = discord.Embed(
+            title=anime["title"]["romaji"], description=anime["synopsis"]
+        )
         embed.set_thumbnail(url=anime["coverImage"]["large"])
         embed.add_field(name="Type", value=anime["format"])
         embed.add_field(name="Episodes", value=anime["episodes"])
@@ -29,12 +31,26 @@ class AnimeCog(commands.Cog):
 
         view = discord.ui.View()
         buttons = [
-            discord.ui.Button(style=discord.ButtonStyle.link, label="AniList", url=anime["siteUrl"]),
-            discord.ui.Button(style=discord.ButtonStyle.link, label="MAL", url=anime["extra_urls"]['mal']),
-            discord.ui.Button(style=discord.ButtonStyle.link, label="ADB", url=anime["extra_urls"]['anidb']),
-            discord.ui.Button(style=discord.ButtonStyle.link, label="ANN", url=anime["extra_urls"]['ann'])
+            discord.ui.Button(
+                style=discord.ButtonStyle.link, label="AniList", url=anime["siteUrl"]
+            ),
+            discord.ui.Button(
+                style=discord.ButtonStyle.link,
+                label="MAL",
+                url=anime["extra_urls"]["mal"],
+            ),
+            discord.ui.Button(
+                style=discord.ButtonStyle.link,
+                label="ADB",
+                url=anime["extra_urls"]["anidb"],
+            ),
+            discord.ui.Button(
+                style=discord.ButtonStyle.link,
+                label="ANN",
+                url=anime["extra_urls"]["ann"],
+            ),
         ]
-        
+
         for button in buttons:
             view.add_item(button)
 

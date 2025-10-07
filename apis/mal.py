@@ -12,5 +12,6 @@ async def get_anime(id: int):
         anime = await jikan.anime(id, extension="full")
         return anime
 
+
 def get_anime_url(id: int):
     return f"https://myanimelist.net/anime/{id}"
