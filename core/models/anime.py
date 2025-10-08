@@ -1,30 +1,34 @@
-from pydantic import BaseModel as PydanticBaseModel
-from pydantic import ConfigDict
+from datetime import date, time
 from typing import Literal, Optional
-from base_models import MediaType
 
-class BaseModel(PydanticBaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, validate_default=True)
+from pydantic.types import PositiveInt
+
+from core.models.base_model import BaseModel
+from core.models.enums import AiringStatus, MediaType, SourceType
+
 
 class SitesURLs(BaseModel):
-    anidb: Optional[str]
-    anilist: Optional[str]
-    ann: Optional[str]
-    mal: Optional[str]
+    anidb: Optional[str] = None
+    anilist: Optional[str] = None
+    ann: Optional[str] = None
+    mal: Optional[str] = None
+
 
 class AnimeAiringInfo(BaseModel):
-    status: Literal["airing", "finished_airing"] #### ?
-    start: str ####
-    end: str ####
-    season: Literal["spring", "summer", "fall", "winter"]
+    status: Optional[AiringStatus] = AiringStatus.NOT_YET_AIRED
+    start: Optional[date] = None
+    end: Optional[date] = None
+    broadcast: Optional[time] = None
+    season: Optional[Literal["spring", "summer", "fall", "winter"]] = None
+
 
 class Anime(BaseModel):
     title: str
-    synopsis: str
+    synopsis: Optional[str] = None
     type: MediaType
-    source: MediaType
-    episodes: Optional[int] = None
-    alt_titles: str  ####
-    synonims: str  ####
+    source: SourceType
+    episodes: Optional[PositiveInt] = None
+    alt_titles: list[str] = []
+    synonyms: list[str] = []
     airing_info: AnimeAiringInfo
-    sites_urls: SitesURLs
+    sites_urls: Optional[SitesURLs] = None
