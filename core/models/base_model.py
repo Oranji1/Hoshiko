@@ -1,7 +1,5 @@
-from enum import Enum
-
 from pydantic import BaseModel as PydanticBaseModel
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict
 
 
 class BaseModel(PydanticBaseModel):
