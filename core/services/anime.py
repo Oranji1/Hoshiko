@@ -2,19 +2,28 @@ from urllib.parse import parse_qs
 
 from apis.anilist import search_anime
 from apis.mal import get_anime
+from core.models.anime import Anime, AnimeAiringInfo, SitesURLs
+from core.models.enums import AiringStatus, MediaType, SourceType
 
 
-async def search(query: str):
+async def search(query: str) -> Anime:
     res = await search_anime(query)
-    anime = res["data"]["Page"]["media"][0]
+    res_anime = res["data"]["Page"]["media"][0]
 
-    mal = await get_anime(anime["idMal"])
+    mal = await get_anime(res_anime["idMal"])
     mal = mal["data"]
 
-    anime["synopsis"] = mal["synopsis"]
+    model = Anime(
+        title=mal["title"],
+        synopsis=mal["synopsis"],
+        cover_url=mal["images"]["webp"]["large_image_url"],
+        type=MediaType(mal["type"]),
+        source=SourceType(mal["source"]),
+        episodes=res_anime["episodes"],
+        airing_info=AnimeAiringInfo(status=AiringStatus(mal["status"])),
+    )
 
-    extra_urls = anime["extra_urls"] = {}
-    extra_urls["mal"] = mal["url"]
+    urls = SitesURLs(mal=mal["url"], anilist=res_anime["siteUrl"])
 
     for ext_url in mal["external"]:
         url_name = ext_url["name"].lower()
@@ -25,10 +34,12 @@ async def search(query: str):
 
             if "aid" in query_params:
                 anidb_id = query_params["aid"][0]
-                extra_urls["anidb"] = f"https://anidb.net/anime/{anidb_id}"
+                urls.anidb = f"https://anidb.net/anime/{anidb_id}"
             else:
-                extra_urls["anidb"] = ext_url["url"]
+                urls.anidb = ext_url["url"]
         elif url_name == "ann":
-            extra_urls["ann"] = ext_url["url"]
+            urls.ann = ext_url["url"]
 
-    return anime
+    model.sites_urls = urls
+
+    return model
