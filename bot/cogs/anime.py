@@ -10,6 +10,7 @@ from core.services import search
 
 if TYPE_CHECKING:
     from bot.hoshiko import Hoshiko
+    from core.models.anime import Anime
 
 
 class AnimeCog(commands.Cog):
@@ -19,35 +20,35 @@ class AnimeCog(commands.Cog):
     @commands.command(name="anime")
     async def anime_command(self, ctx: Context, *, anime: str) -> None:
         await ctx.send(f"Searching for {anime}...")
-        anime = await search(anime)
+        anime: Anime = await search(anime)
 
-        embed = discord.Embed(
-            title=anime["title"]["romaji"], description=anime["synopsis"]
-        )
-        embed.set_thumbnail(url=anime["coverImage"]["large"])
-        embed.add_field(name="Type", value=anime["format"])
-        embed.add_field(name="Episodes", value=anime["episodes"])
-        embed.add_field(name="Source", value=anime["source"])
+        embed = discord.Embed(title=anime.title, description=anime.synopsis)
+        embed.set_thumbnail(url=anime.cover_url)
+        embed.add_field(name="Type", value=anime.type)
+        embed.add_field(name="Episodes", value=anime.episodes)
+        embed.add_field(name="Source", value=anime.source)
 
         view = discord.ui.View()
         buttons = [
             discord.ui.Button(
-                style=discord.ButtonStyle.link, label="AniList", url=anime["siteUrl"]
+                style=discord.ButtonStyle.link,
+                label="AniList",
+                url=anime.sites_urls.anilist.encoded_string(),
             ),
             discord.ui.Button(
                 style=discord.ButtonStyle.link,
                 label="MAL",
-                url=anime["extra_urls"]["mal"],
+                url=anime.sites_urls.mal.encoded_string(),
             ),
             discord.ui.Button(
                 style=discord.ButtonStyle.link,
                 label="ADB",
-                url=anime["extra_urls"]["anidb"],
+                url=anime.sites_urls.anidb.encoded_string(),
             ),
             discord.ui.Button(
                 style=discord.ButtonStyle.link,
                 label="ANN",
-                url=anime["extra_urls"]["ann"],
+                url=anime.sites_urls.ann.encoded_string(),
             ),
         ]
 

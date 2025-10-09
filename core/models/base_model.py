@@ -8,5 +8,5 @@ class BaseModel(PydanticBaseModel):
         validate_default=True,
         validate_by_name=True,
         use_enum_values=True,
-        validate_assignment=True
+        validate_assignment=True,
     )
