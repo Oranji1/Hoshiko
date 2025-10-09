@@ -40,6 +40,7 @@ class AnimeAiringInfo(BaseModel):
 class Anime(BaseModel):
     title: str
     synopsis: Optional[str] = None
+    cover_url: Optional[Annotated[HttpUrl, host_url_validator("cdn.myanimelist.net")]]
     type: MediaType
     source: SourceType
     episodes: Optional[PositiveInt] = None
