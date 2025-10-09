@@ -1,13 +1,24 @@
 from enum import Enum
 
 
-class AiringStatus(str, Enum):
+class BaseStrEnum(str, Enum):
+    @classmethod
+    def _missing_(cls, value):
+        if isinstance(value, str):
+            value = value.lower()
+            for member in cls:
+                if member.value.lower() == value:
+                    return member
+        return super()._missing_(value)
+
+
+class AiringStatus(BaseStrEnum):
     AIRING = "Currently airing"
     FINISHED = "Finished airing"
     NOT_YET_AIRED = "Not yet aired"
 
 
-class MediaType(str, Enum):
+class MediaType(BaseStrEnum):
     TV = "TV"
     MOVIE = "Movie"
     OVA = "OVA"
@@ -22,7 +33,7 @@ class MediaType(str, Enum):
     MANHUA = "Manhua"
 
 
-class SourceType(str, Enum):
+class SourceType(BaseStrEnum):
     ORIGINAL = "Original"
     MANGA = "Manga"
     LIGHT_NOVEL = "Light Novel"
