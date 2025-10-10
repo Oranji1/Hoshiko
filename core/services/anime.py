@@ -1,4 +1,4 @@
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlparse
 
 from apis.anilist import search_anime
 from apis.mal import get_anime
@@ -6,40 +6,61 @@ from core.models.anime import Anime, AnimeAiringInfo, SitesURLs
 from core.models.enums import AiringStatus, MediaType, SourceType
 
 
-async def search(query: str) -> Anime:
-    res = await search_anime(query)
-    res_anime = res["data"]["Page"]["media"][0]
+def _clean_anidb_url(original_url: str) -> str:
+    try:
+        parsed_url = urlparse(original_url)
+        query_params = parse_qs(parsed_url.query)
 
-    mal = await get_anime(res_anime["idMal"])
-    mal = mal["data"]
+        if "aid" in query_params:
+            anidb_id = query_params["aid"][0]
+            return f"https://anidb.net/anime/{anidb_id}"
+    except (ValueError, IndexError):
+        pass
+
+    return original_url
+
+
+async def search(query: str) -> Anime:
+    anilist_response = await search_anime(query)
+    anilist_data = anilist_response.get("data").get("Page").get("media")[0]
+    if not anilist_data:
+        return None
+
+    mal_id = anilist_data.get("idMal")
+
+    if not mal_id:
+        return None
+
+    mal_response = await get_anime(mal_id)
+    mal_data = mal_response.get("data")
+
+    if not mal_data:
+        return None
 
     model = Anime(
-        title=mal["title"],
-        synopsis=mal["synopsis"],
-        cover_url=mal["images"]["webp"]["large_image_url"],
-        type=MediaType(mal["type"]),
-        source=SourceType(mal["source"]),
-        episodes=res_anime["episodes"],
-        airing_info=AnimeAiringInfo(status=AiringStatus(mal["status"])),
+        title=mal_data.get("title", "N/A"),
+        synopsis=mal_data.get("synopsis"),
+        cover_url=mal_data.get("images").get("webp").get("large_image_url"),
+        type=MediaType(mal_data.get("type")),
+        source=SourceType(mal_data.get("source", "OTHER")),
+        episodes=anilist_data.get("episodes"),
+        airing_info=AnimeAiringInfo(status=AiringStatus(mal_data.get("status"))),
     )
 
-    urls = SitesURLs(mal=mal["url"], anilist=res_anime["siteUrl"])
+    sites_urls = SitesURLs(anilist=anilist_data.get("siteUrl"), mal=mal_data.get("url"))
+    external_links = mal_data.get("external", [])
+    for link_data in external_links:
+        site_name = link_data.get("name", "").lower()
+        url = link_data.get("url")
 
-    for ext_url in mal["external"]:
-        url_name = ext_url["name"].lower()
+        if not url:
+            continue
 
-        if url_name == "anidb":
-            anidb_url = ext_url["url"]
-            query_params = parse_qs(anidb_url)
+        if site_name == "anidb":
+            sites_urls.anidb = _clean_anidb_url(url)
+        elif site_name == "ann":
+            sites_urls.ann = url
 
-            if "aid" in query_params:
-                anidb_id = query_params["aid"][0]
-                urls.anidb = f"https://anidb.net/anime/{anidb_id}"
-            else:
-                urls.anidb = ext_url["url"]
-        elif url_name == "ann":
-            urls.ann = ext_url["url"]
-
-    model.sites_urls = urls
+    model.sites_urls = sites_urls
 
     return model
