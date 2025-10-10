@@ -47,6 +47,16 @@ async def search(query: str) -> Anime:
         airing_info=AnimeAiringInfo(status=AiringStatus(mal_data.get("status"))),
     )
 
+    for t in mal_data.get("titles"):
+        title_type = t["type"]
+        title = t["title"]
+
+        if title_type.lower() == "synonym":
+            model.synonyms.append(title)
+            continue
+
+        model.alt_titles[title_type] = title
+
     sites_urls = SitesURLs(anilist=anilist_data.get("siteUrl"), mal=mal_data.get("url"))
     external_links = mal_data.get("external", [])
     for link_data in external_links:
