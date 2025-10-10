@@ -1,5 +1,5 @@
 from datetime import date, time
-from typing import Annotated, Literal, Optional
+from typing import Annotated, Dict, List, Literal, Optional
 
 from pydantic import AfterValidator, BaseModel, HttpUrl
 from pydantic.types import PositiveInt
@@ -44,7 +44,7 @@ class Anime(BaseModel):
     type: MediaType
     source: SourceType
     episodes: Optional[PositiveInt] = None
-    alt_titles: list[str] = []
-    synonyms: list[str] = []
+    alt_titles: Dict[str, str] = {}
+    synonyms: List[str] = []
     airing_info: AnimeAiringInfo
     sites_urls: Optional[SitesURLs] = None
