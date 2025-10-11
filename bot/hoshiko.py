@@ -5,6 +5,8 @@ import discord
 import jishaku
 from discord.ext import commands
 
+from core.cache import CacheManager
+
 with open(f"{os.getcwd()}/config.json", encoding="utf-8") as file:
     config = json.load(file)
 
@@ -34,6 +36,7 @@ class Hoshiko(commands.Bot):
             help_command=None,
         )
         self.config = config
+        self.cm = CacheManager()
 
     async def load_cogs(self) -> None:
         for file in os.listdir(f"{os.path.realpath(os.path.dirname(__file__))}/cogs"):

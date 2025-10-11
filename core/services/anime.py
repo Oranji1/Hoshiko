@@ -2,6 +2,7 @@ from urllib.parse import parse_qs, urlparse
 
 from apis.anilist import search_anime
 from apis.mal import get_anime
+from core.cache import CacheManager
 from core.models.anime import Anime, AnimeAiringInfo, SitesURLs
 from core.models.enums import AiringStatus, MediaType, SourceType
 
@@ -20,7 +21,10 @@ def _clean_anidb_url(original_url: str) -> str:
     return original_url
 
 
-async def search(query: str) -> Anime:
+async def search(query: str, cache: CacheManager) -> Anime:
+    if cached_anime := cache.get_by_title(query):
+        return Anime.model_validate(cached_anime)
+
     anilist_response = await search_anime(query)
     anilist_data = anilist_response.get("data").get("Page").get("media")[0]
     if not anilist_data:
@@ -72,5 +76,7 @@ async def search(query: str) -> Anime:
             sites_urls.ann = url
 
     model.sites_urls = sites_urls
+
+    cache.add(model)
 
     return model

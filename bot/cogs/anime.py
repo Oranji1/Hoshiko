@@ -20,7 +20,7 @@ class AnimeCog(commands.Cog):
     @commands.command(name="anime")
     async def anime_command(self, ctx: Context, *, anime: str) -> None:
         await ctx.send(f"Searching for {anime}...")
-        anime: Anime = await search(anime)
+        anime: Anime = await search(anime, self.bot.cm)
 
         embed = discord.Embed(title=anime.title, description=anime.synopsis)
         embed.set_thumbnail(url=anime.cover_url)
