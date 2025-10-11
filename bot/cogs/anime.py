@@ -22,6 +22,10 @@ class AnimeCog(commands.Cog):
         await ctx.send(f"Searching for {anime}...")
         anime: Anime = await search(anime, self.bot.cm)
 
+        if not anime:
+            await ctx.send("Oops! I couldn't find that anime...")
+            return
+
         embed = discord.Embed(title=anime.title, description=anime.synopsis)
         embed.set_thumbnail(url=anime.cover_url)
         embed.add_field(name="Type", value=anime.type)
