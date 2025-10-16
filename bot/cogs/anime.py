@@ -4,17 +4,18 @@ from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands
-from discord.ext.commands import Context
 
 from core.services import search
 
 if TYPE_CHECKING:
+    from discord.ext.commands import Context
+
     from bot.hoshiko import Hoshiko
     from core.models.anime import Anime
 
 
 class AnimeCog(commands.Cog):
-    def __init__(self, bot: Hoshiko):
+    def __init__(self, bot: Hoshiko) -> None:
         self.bot = bot
 
     @commands.command(name="anime")

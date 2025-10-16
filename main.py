@@ -10,7 +10,7 @@ else:
     RUNTIME = uvloop.run
 
 
-async def main():
+async def main() -> None:
     async with Hoshiko() as bot:
         await bot.start()
 

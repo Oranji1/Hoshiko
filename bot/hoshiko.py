@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 import discord
 import jishaku
@@ -7,7 +8,7 @@ from discord.ext import commands
 
 from core.cache import CacheManager
 
-with open(f"{os.getcwd()}/config.json", encoding="utf-8") as file:
+with Path(f"{Path.cwd()}/config.json").open(encoding="utf-8") as file:
     config = json.load(file)
 
 TOKEN = config["bot"]["token"]
@@ -39,14 +40,11 @@ class Hoshiko(commands.Bot):
         self.cm = CacheManager()
 
     async def load_cogs(self) -> None:
-        for file in os.listdir(f"{os.path.realpath(os.path.dirname(__file__))}/cogs"):
+        for file in Path.iterdir(f"{os.path.realpath(Path(__file__).parent)}/cogs"):
             if file.endswith(".py"):
                 extension = file[:-3]
-                try:
-                    await self.load_extension(f"bot.cogs.{extension}")
-                    print(f"Loaded extension '{extension}'")
-                except Exception as e:
-                    raise e
+                await self.load_extension(f"bot.cogs.{extension}")
+                print(f"Loaded extension '{extension}'")  # noqa: T201 # I'll properly handle this later
 
     async def setup_hook(self) -> None:
         await self.load_extension("jishaku")

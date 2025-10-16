@@ -18,3 +18,33 @@ dependencies = [
 dev = [
     "ruff>=0.14.0",
 ]
+
+[tool.ruff]
+line-length = 100
+preview = true
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "ASYNC240", # I don't like trio/anyio
+    "C90", # Lol
+    "COM812", # ruff format suggested
+    "CPY001", # I hate this
+    "D" # Temporary ignore until 0.2, it would be annoying to document everything now
+]
+unfixable = [
+    "E501",  # Line length handled in other ways by ruff format
+    "ERA",  # Don't delete commented out code
+]
+
+[tool.ruff.lint.per-file-ignores]
+"bot/**.py" = ["INP001"] # Annoying, but I may change it later
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+line-ending = "lf"
