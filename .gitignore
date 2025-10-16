@@ -1,7 +1,8 @@
 __pycache__/
 
-
 .vscode/
+
+.ruff_cache/
 
 config.json
 .env

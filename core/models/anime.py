@@ -1,7 +1,7 @@
 from datetime import date, time
 from typing import Annotated, Dict, List, Literal, Optional
 
-from pydantic import AfterValidator, BaseModel, HttpUrl
+from pydantic import AfterValidator, HttpUrl
 from pydantic.types import PositiveInt
 
 from core.models.base_model import BaseModel
