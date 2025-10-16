@@ -1,22 +1,13 @@
 from datetime import date, time
 from typing import Annotated, Literal
 
-from pydantic import AfterValidator, HttpUrl
+from pydantic import HttpUrl
 from pydantic.types import PositiveInt
 
-from core.models.base_model import BaseModel
-from core.models.enums import AiringStatus, MediaType, SourceType
+from core.utils import host_url_validator
 
-
-def check_host(url: HttpUrl, allowed_host: str) -> HttpUrl:
-    if url.host != allowed_host:
-        msg = f"Invalid host URL. Expected '{allowed_host}', got '{url.host}'."
-        raise TypeError(msg)
-    return url
-
-
-def host_url_validator(host: str) -> AfterValidator:
-    return AfterValidator(lambda url: check_host(url, host))
+from .base_model import BaseModel
+from .enums import AiringStatus, MediaType, SourceType
 
 
 class SitesURLs(BaseModel):

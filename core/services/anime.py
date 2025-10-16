@@ -1,24 +1,10 @@
-from urllib.parse import parse_qs, urlparse
 
 from apis.anilist import search_anime
 from apis.mal import get_anime
 from core.cache import CacheManager
 from core.models.anime import Anime, AnimeAiringInfo, SitesURLs
 from core.models.enums import AiringStatus, MediaType, SourceType
-
-
-def _clean_anidb_url(original_url: str) -> str:
-    try:
-        parsed_url = urlparse(original_url)
-        query_params = parse_qs(parsed_url.query)
-
-        if "aid" in query_params:
-            anidb_id = query_params["aid"][0]
-            return f"https://anidb.net/anime/{anidb_id}"
-    except (ValueError, IndexError):
-        pass
-
-    return original_url
+from core.utils import clean_anidb_url
 
 
 async def search(query: str, cache: CacheManager) -> Anime:
@@ -71,7 +57,7 @@ async def search(query: str, cache: CacheManager) -> Anime:
             continue
 
         if site_name == "anidb":
-            sites_urls.anidb = _clean_anidb_url(url)
+            sites_urls.anidb = clean_anidb_url(url)
         elif site_name == "ann":
             sites_urls.ann = url
 
