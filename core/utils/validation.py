@@ -1,10 +1,11 @@
 from pydantic import AfterValidator, HttpUrl
 
+from core.errors import HostValidationError
+
 
 def check_host(url: HttpUrl, allowed_host: str) -> HttpUrl:
     if url.host != allowed_host:
-        msg = f"Invalid host URL. Expected '{allowed_host}', got '{url.host}'."
-        raise TypeError(msg)
+        raise HostValidationError(allowed_host, url.host)
     return url
 
 
