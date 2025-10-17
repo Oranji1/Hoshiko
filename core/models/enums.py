@@ -1,8 +1,8 @@
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
-class BaseStrEnum(str, Enum):
+class BaseStrEnum(StrEnum):
     @classmethod
     def _missing_(cls, value: str) -> Any:  # noqa: ANN401
         value = value.lower()
