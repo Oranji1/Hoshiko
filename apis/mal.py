@@ -1,17 +1,10 @@
 from jikanpy import AioJikan
 
+# async def search_anime(query: str) -> dict:
+#     async with AioJikan() as jikan:
+#         return await jikan.search(search_type="anime", query=query, page=1)
 
-async def search_anime(query: str):
+
+async def get_anime(mal_id: int) -> dict:
     async with AioJikan() as jikan:
-        result = await jikan.search(search_type="anime", query=query, page=1)
-        return result
-
-
-async def get_anime(id: int):
-    async with AioJikan() as jikan:
-        anime = await jikan.anime(id, extension="full")
-        return anime
-
-
-def get_anime_url(id: int):
-    return f"https://myanimelist.net/anime/{id}"
+        return await jikan.anime(mal_id, extension="full")

@@ -18,7 +18,7 @@ class CacheManager:
         class SyncedLRUCache(LRUCache):
             def __init__(
                 self, parent: CacheManager, *args: tuple, **kwargs: dict[str, str]
-            ) -> None:  # noqa: E501
+            ) -> None:
                 super().__init__(*args, **kwargs)
                 self._parent = parent
 

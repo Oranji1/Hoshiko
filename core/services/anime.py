@@ -1,6 +1,5 @@
-from apis.anilist import search_anime
-from apis.mal import get_anime
-from core.cache import CacheManager
+from apis import get_mal_anime, search_anilist_anime
+from core import CacheManager
 from core.errors import APIError, ResourceNotFoundError, SearchNotFoundError
 from core.models import AiringStatus, Anime, AnimeAiringInfo, MediaType, SitesURLs, SourceType
 from core.utils import clean_anidb_url
@@ -12,7 +11,7 @@ async def search(query: str, cache: CacheManager) -> Anime:
 
     # I know this all looks awful, I'll rewrite it in v0.2
     try:
-        anilist_response = await search_anime(query)
+        anilist_response = await search_anilist_anime(query)
         media = anilist_response.get("data", {}).get("Page", {}).get("media", [])
     except Exception as e:
         raise APIError("AniList", str(e)) from e  # noqa: EM101 # I'll properly handle these linter's errors later
@@ -27,7 +26,7 @@ async def search(query: str, cache: CacheManager) -> Anime:
         raise ResourceNotFoundError("idMal", "AniList", query)  # noqa: EM101
 
     try:
-        mal_response = await get_anime(mal_id)
+        mal_response = await get_mal_anime(mal_id)
         mal_data = mal_response.get("data")
     except Exception as e:
         raise APIError("MyAnimeList", str(e)) from e  # noqa: EM101

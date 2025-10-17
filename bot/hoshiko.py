@@ -6,7 +6,7 @@ import discord
 import jishaku
 from discord.ext import commands
 
-from core.cache import CacheManager
+from core import CacheManager
 
 with Path(f"{Path.cwd()}/config.json").open(encoding="utf-8") as file:
     config = json.load(file)
@@ -40,7 +40,7 @@ class Hoshiko(commands.Bot):
         self.cm = CacheManager()
 
     async def load_cogs(self) -> None:
-        for file in Path.iterdir(f"{os.path.realpath(Path(__file__).parent)}/cogs"):
+        for file in os.listdir(f"{os.path.realpath(Path(__file__).parent)}/cogs"):  # noqa: PTH208
             if file.endswith(".py"):
                 extension = file[:-3]
                 await self.load_extension(f"bot.cogs.{extension}")

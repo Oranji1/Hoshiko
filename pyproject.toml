@@ -39,6 +39,7 @@ unfixable = [
 
 [tool.ruff.lint.per-file-ignores]
 "bot/**.py" = ["INP001"] # Annoying, but I may change it later
+"__init__.py" = ["F401"]
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
