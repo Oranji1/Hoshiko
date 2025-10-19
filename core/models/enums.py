@@ -36,6 +36,7 @@ class MediaType(BaseStrEnum):
 class SourceType(BaseStrEnum):
     ORIGINAL = "Original"
     MANGA = "Manga"
+    NOVEL = "Novel"
     LIGHT_NOVEL = "Light Novel"
     VISUAL_NOVEL = "Visual Novel"
     GAME = "Game"
