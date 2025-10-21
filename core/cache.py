@@ -4,6 +4,7 @@ import uuid
 from typing import TYPE_CHECKING, Any
 
 from cachetools import LRUCache
+from rapidfuzz import fuzz, process
 
 if TYPE_CHECKING:
     from core.models.anime import Anime
@@ -13,7 +14,7 @@ def make_uuid() -> str:
     return str(uuid.uuid4())
 
 
-class CacheManager:
+class CacheManager:  # Yes, this is horrible, I know
     def __init__(self, maxsize: int = 512) -> None:
         class SyncedLRUCache(LRUCache):
             def __init__(
@@ -53,6 +54,18 @@ class CacheManager:
         return self.main_cache.get(cache_id)
 
     def get_by_title(self, title: str) -> Anime | None:
-        if cache_id := self.title_cache.get(title.lower()):
+        title = title.lower()
+
+        if cache_id := self.title_cache.get(title):
             return self.main_cache.get(cache_id)
-        return None
+
+        result = process.extractOne(
+            title,
+            self.title_cache.keys(),
+            scorer=fuzz.WRatio,
+            score_cutoff=80,
+        )
+
+        if result:
+            result = self.title_cache.get(result[0])
+        return self.main_cache.get(result)
