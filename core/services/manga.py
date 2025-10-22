@@ -1,17 +1,16 @@
-from apis import get_mal_anime, search_anilist_anime
+from apis import get_mal_manga, search_anilist_manga
 from core import CacheManager
 from core.errors import APIError, ResourceNotFoundError, SearchNotFoundError
-from core.models import AiringStatus, Anime, AnimeAiringInfo, AnimeSitesURLs, MediaType, SourceType
-from core.utils import clean_anidb_url
+from core.models import Manga, MangaPublicationInfo, MangaSitesURLs, MediaType, PublicationStatus
 
 
-async def search(query: str, cache: CacheManager) -> Anime:
-    if cached_anime := cache.get_by_title("anime", query):
-        return Anime.model_validate(cached_anime)
+async def search(query: str, cache: CacheManager) -> Manga:
+    if cached_anime := cache.get_by_title("manga", query):
+        return Manga.model_validate(cached_anime)
 
     # I know this all looks awful, I'll rewrite it in v0.2
     try:
-        anilist_response = await search_anilist_anime(query)
+        anilist_response = await search_anilist_manga(query)
         media = anilist_response.get("data", {}).get("Page", {}).get("media", [])
     except Exception as e:
         raise APIError("AniList", str(e)) from e  # noqa: EM101 # I'll properly handle these linter's errors later
@@ -26,7 +25,7 @@ async def search(query: str, cache: CacheManager) -> Anime:
         raise ResourceNotFoundError("idMal", "AniList", query)  # noqa: EM101
 
     try:
-        mal_response = await get_mal_anime(mal_id)
+        mal_response = await get_mal_manga(mal_id)
         mal_data = mal_response.get("data")
     except Exception as e:
         raise APIError("MyAnimeList", str(e)) from e  # noqa: EM101
@@ -34,14 +33,17 @@ async def search(query: str, cache: CacheManager) -> Anime:
     if not mal_data:
         raise SearchNotFoundError(query, "MyAnimeList")
 
-    model = Anime(
+    sites_urls = MangaSitesURLs(anilist=anilist_data.get("siteUrl"), mal=mal_data.get("url"))
+
+    model = Manga(
         title=mal_data.get("title", "N/A"),
         synopsis=mal_data.get("synopsis"),
         cover_url=mal_data.get("images").get("webp").get("large_image_url"),
         type=MediaType(mal_data.get("type")),
-        source=SourceType(mal_data.get("source", "OTHER")),
-        episodes=anilist_data.get("episodes"),
-        airing_info=AnimeAiringInfo(status=AiringStatus(mal_data.get("status"))),
+        chapters=anilist_data.get("chapters"),
+        volumes=anilist_data.get("volumes"),
+        publication_info=MangaPublicationInfo(status=PublicationStatus(mal_data.get("status"))),
+        sites_urls=sites_urls,
     )
 
     for t in mal_data.get("titles"):
@@ -54,22 +56,6 @@ async def search(query: str, cache: CacheManager) -> Anime:
 
         model.alt_titles[title_type] = title
 
-    sites_urls = AnimeSitesURLs(anilist=anilist_data.get("siteUrl"), mal=mal_data.get("url"))
-    external_links = mal_data.get("external", [])
-    for link_data in external_links:
-        site_name = link_data.get("name", "").lower()
-        url = link_data.get("url")
-
-        if not url:
-            continue
-
-        if site_name == "anidb":
-            sites_urls.anidb = clean_anidb_url(url)
-        elif site_name == "ann":
-            sites_urls.ann = url
-
-    model.sites_urls = sites_urls
-
-    cache.add("anime", model)
+    cache.add("manga", model)
 
     return model

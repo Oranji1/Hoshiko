@@ -18,6 +18,13 @@ class AiringStatus(BaseStrEnum):
     NOT_YET_AIRED = "Not yet aired"
 
 
+class PublicationStatus(BaseStrEnum):
+    PUBLISING = "Publishing"
+    FINISHED = "Finished"
+    HIATUS = "On hiatus"
+    NOT_YET_PUBLISHED = "Not yet published"
+
+
 class MediaType(BaseStrEnum):
     TV = "TV"
     MOVIE = "Movie"

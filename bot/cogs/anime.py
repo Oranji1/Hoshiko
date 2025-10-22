@@ -5,13 +5,13 @@ from typing import TYPE_CHECKING
 import discord
 from discord.ext import commands
 
-from core.services import search
+from core.services import search_anime
 
 if TYPE_CHECKING:
     from discord.ext.commands import Context
 
     from bot.hoshiko import Hoshiko
-    from core.models.anime import Anime
+    from core.models import Anime
 
 
 class AnimeCog(commands.Cog):
@@ -21,7 +21,7 @@ class AnimeCog(commands.Cog):
     @commands.command(name="anime")
     async def anime_command(self, ctx: Context, *, anime: str) -> None:
         await ctx.send(f"Searching for {anime}...")
-        anime: Anime = await search(anime, self.bot.cm)
+        anime: Anime = await search_anime(anime, self.bot.cm)
 
         if not anime:
             await ctx.send("Oops! I couldn't find that anime...")

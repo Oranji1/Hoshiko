@@ -10,7 +10,7 @@ from .base_model import BaseModel
 from .enums import AiringStatus, MediaType, SourceType
 
 
-class SitesURLs(BaseModel):
+class AnimeSitesURLs(BaseModel):
     anidb: Annotated[HttpUrl, host_url_validator("anidb.net")] | None = None
     anilist: Annotated[HttpUrl, host_url_validator("anilist.co")] | None = None
     ann: Annotated[HttpUrl, host_url_validator("www.animenewsnetwork.com")] | None = None
@@ -35,4 +35,4 @@ class Anime(BaseModel):
     alt_titles: dict[str, str] = {}  # noqa: RUF012
     synonyms: list[str] = []  # noqa: RUF012
     airing_info: AnimeAiringInfo
-    sites_urls: SitesURLs | None = None
+    sites_urls: AnimeSitesURLs | None = None
