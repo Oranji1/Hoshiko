@@ -20,14 +20,20 @@ class MangaCog(commands.Cog):
 
     @commands.command(name="manga")
     async def manga_command(self, ctx: Context, *, query: str) -> None:
-        await ctx.send(f"Searching for {query}...")
+        embed = discord.Embed(
+            description=f"Searching for {query}...", color=discord.Color.light_gray()
+        )
+        msg = await ctx.reply(embed=embed, mention_author=False)
         manga: Manga = await search_manga(query, self.bot.cm)
 
         if not manga:
-            await ctx.send("Oops! I couldn't find that manga...")
+            embed.description = "Oops! I couldn't find that manga..."
+            embed.color = discord.Color.brand_red()
+            await msg.edit(embed=embed)
             return
 
-        embed = discord.Embed(title=manga.title, description=manga.synopsis)
+        embed.title = manga.title
+        embed.description = manga.synopsis
         embed.set_thumbnail(url=manga.cover_url)
         embed.add_field(name="Type", value=manga.type)
         embed.add_field(name="Chapters", value=manga.chapters)
@@ -50,7 +56,7 @@ class MangaCog(commands.Cog):
         for button in buttons:
             view.add_item(button)
 
-        await ctx.send(embed=embed, view=view)
+        await msg.edit(embed=embed, view=view)
 
 
 async def setup(client: commands.Bot) -> None:

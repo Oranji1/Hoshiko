@@ -19,15 +19,21 @@ class AnimeCog(commands.Cog):
         self.bot = bot
 
     @commands.command(name="anime")
-    async def anime_command(self, ctx: Context, *, anime: str) -> None:
-        await ctx.send(f"Searching for {anime}...")
-        anime: Anime = await search_anime(anime, self.bot.cm)
+    async def anime_command(self, ctx: Context, *, query: str) -> None:
+        embed = discord.Embed(
+            description=f"Searching for {query}...", color=discord.Color.light_gray()
+        )
+        msg = await ctx.reply(embed=embed, mention_author=False)
+        anime: Anime = await search_anime(query, self.bot.cm)
 
         if not anime:
-            await ctx.send("Oops! I couldn't find that anime...")
+            embed.description = "Oops! I couldn't find that anime..."
+            embed.color = discord.Color.brand_red()
+            await msg.edit(embed=embed)
             return
 
-        embed = discord.Embed(title=anime.title, description=anime.synopsis)
+        embed.title = anime.title
+        embed.description = anime.synopsis
         embed.set_thumbnail(url=anime.cover_url)
         embed.add_field(name="Type", value=anime.type)
         embed.add_field(name="Episodes", value=anime.episodes)
@@ -60,7 +66,7 @@ class AnimeCog(commands.Cog):
         for button in buttons:
             view.add_item(button)
 
-        await ctx.send(embed=embed, view=view)
+        await msg.edit(embed=embed, view=view)
 
 
 async def setup(client: commands.Bot) -> None:
