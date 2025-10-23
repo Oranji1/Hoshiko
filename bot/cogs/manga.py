@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import discord
 from discord.ext import commands
@@ -19,12 +19,16 @@ class MangaCog(commands.Cog):
         self.bot = bot
 
     @commands.command(name="manga")
-    async def manga_command(self, ctx: Context, *, query: str) -> None:
+    async def manga_command(
+        self, ctx: Context, dont_check_cached: Literal["--no-cache"] | None = None, *, query: str
+    ) -> None:
         embed = discord.Embed(
             description=f"Searching for {query}...", color=discord.Color.light_gray()
         )
         msg = await ctx.reply(embed=embed, mention_author=False)
-        manga: Manga = await search_manga(query, self.bot.cm)
+
+        check_cached = not dont_check_cached
+        manga: Manga = await search_manga(query, check_cached=check_cached, cache=self.bot.cm)
 
         if not manga:
             embed.description = "Oops! I couldn't find that manga..."

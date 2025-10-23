@@ -4,8 +4,9 @@ from core.errors import APIError, ResourceNotFoundError, SearchNotFoundError
 from core.models import Manga, MangaPublicationInfo, MangaSitesURLs, MediaType, PublicationStatus
 
 
-async def search(query: str, cache: CacheManager) -> Manga:
-    if cached_anime := cache.get_by_title("manga", query):
+async def search(query: str, *, check_cached: bool, cache: CacheManager) -> Manga:
+    cached_anime = cache.get_by_title("manga", query) if check_cached else None
+    if cached_anime:
         return Manga.model_validate(cached_anime)
 
     # I know this all looks awful, I'll rewrite it in v0.2

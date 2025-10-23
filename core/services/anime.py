@@ -5,8 +5,9 @@ from core.models import AiringStatus, Anime, AnimeAiringInfo, AnimeSitesURLs, Me
 from core.utils import clean_anidb_url
 
 
-async def search(query: str, cache: CacheManager) -> Anime:
-    if cached_anime := cache.get_by_title("anime", query):
+async def search(query: str, *, check_cached: bool, cache: CacheManager) -> Anime:
+    cached_anime = cache.get_by_title("anime", query) if check_cached else None
+    if cached_anime:
         return Anime.model_validate(cached_anime)
 
     # I know this all looks awful, I'll rewrite it in v0.2

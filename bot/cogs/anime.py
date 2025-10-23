@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import discord
 from discord.ext import commands
@@ -19,12 +19,16 @@ class AnimeCog(commands.Cog):
         self.bot = bot
 
     @commands.command(name="anime")
-    async def anime_command(self, ctx: Context, *, query: str) -> None:
+    async def anime_command(
+        self, ctx: Context, dont_check_cached: Literal["--no-cache"] | None = None, *, query: str
+    ) -> None:
         embed = discord.Embed(
             description=f"Searching for {query}...", color=discord.Color.light_gray()
         )
         msg = await ctx.reply(embed=embed, mention_author=False)
-        anime: Anime = await search_anime(query, self.bot.cm)
+
+        check_cached = not dont_check_cached
+        anime: Anime = await search_anime(query, check_cached=check_cached, cache=self.bot.cm)
 
         if not anime:
             embed.description = "Oops! I couldn't find that anime..."
