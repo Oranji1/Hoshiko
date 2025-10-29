@@ -1,13 +1,15 @@
+from msgspec import convert
+
 from apis import get_mal_manga, search_anilist_manga
 from core import CacheManager
 from core.errors import APIError, ResourceNotFoundError, SearchNotFoundError
-from core.models import Manga, MangaPublicationInfo, MangaSitesURLs, MediaType, PublicationStatus
+from core.structs import Manga, MangaPublicationInfo, MangaSitesURLs, MediaType, PublicationStatus
 
 
 async def search(query: str, *, check_cached: bool, cache: CacheManager) -> Manga:
-    cached_anime = cache.get_by_title("manga", query) if check_cached else None
-    if cached_anime:
-        return Manga.model_validate(cached_anime)
+    cached_manga = cache.get_by_title("manga", query) if check_cached else None
+    if cached_manga:
+        return convert(cached_manga, Manga)
 
     # I know this all looks awful, I'll rewrite it in v0.2
     try:
@@ -31,32 +33,20 @@ async def search(query: str, *, check_cached: bool, cache: CacheManager) -> Mang
     except Exception as e:
         raise APIError("MyAnimeList", str(e)) from e  # noqa: EM101
 
-    if not mal_data:
-        raise SearchNotFoundError(query, "MyAnimeList")
+    sites_urls = MangaSitesURLs(anilist=anilist_data.get("siteUrl"), mal=mal_data["url"])
 
-    sites_urls = MangaSitesURLs(anilist=anilist_data.get("siteUrl"), mal=mal_data.get("url"))
-
-    model = Manga(
+    manga = Manga(
         title=mal_data.get("title", "N/A"),
-        synopsis=mal_data.get("synopsis"),
-        cover_url=mal_data.get("images").get("webp").get("large_image_url"),
-        type=MediaType(mal_data.get("type")),
-        chapters=anilist_data.get("chapters"),
-        volumes=anilist_data.get("volumes"),
-        publication_info=MangaPublicationInfo(status=PublicationStatus(mal_data.get("status"))),
+        synopsis=mal_data.get("synopsis", "N/A"),
+        cover_url=mal_data["images"]["webp"].get("large_image_url"),
+        type=MediaType(mal_data["type"]),
+        chapters=anilist_data["chapters"],
+        volumes=anilist_data["volumes"],
+        titles=mal_data["titles"],
+        publication_info=MangaPublicationInfo(status=PublicationStatus(mal_data["status"])),
         sites_urls=sites_urls,
     )
 
-    for t in mal_data.get("titles"):
-        title_type = t["type"]
-        title = t["title"]
+    cache.add("manga", manga)
 
-        if title_type.lower() == "synonym":
-            model.synonyms.append(title)
-            continue
-
-        model.alt_titles[title_type] = title
-
-    cache.add("manga", model)
-
-    return model
+    return manga

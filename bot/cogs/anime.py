@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from discord.ext.commands import Context
 
     from bot.hoshiko import Hoshiko
-    from core.models import Anime
+    from core.structs import Anime
 
 
 class AnimeCog(commands.Cog):
@@ -48,22 +48,22 @@ class AnimeCog(commands.Cog):
             discord.ui.Button(
                 style=discord.ButtonStyle.link,
                 label="AniList",
-                url=anime.sites_urls.anilist.encoded_string(),
+                url=anime.sites_urls.anilist,
             ),
             discord.ui.Button(
                 style=discord.ButtonStyle.link,
                 label="MAL",
-                url=anime.sites_urls.mal.encoded_string(),
+                url=anime.sites_urls.mal,
             ),
             discord.ui.Button(
                 style=discord.ButtonStyle.link,
                 label="ADB",
-                url=anime.sites_urls.anidb.encoded_string(),
+                url=anime.sites_urls.anidb,
             ),
             discord.ui.Button(
                 style=discord.ButtonStyle.link,
                 label="ANN",
-                url=anime.sites_urls.ann.encoded_string(),
+                url=anime.sites_urls.ann,
             ),
         ]
 

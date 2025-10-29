@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from discord.ext.commands import Context
 
     from bot.hoshiko import Hoshiko
-    from core.models import Manga
+    from core.structs import Manga
 
 
 class MangaCog(commands.Cog):
@@ -48,12 +48,12 @@ class MangaCog(commands.Cog):
             discord.ui.Button(
                 style=discord.ButtonStyle.link,
                 label="AniList",
-                url=manga.sites_urls.anilist.encoded_string(),
+                url=manga.sites_urls.anilist,
             ),
             discord.ui.Button(
                 style=discord.ButtonStyle.link,
                 label="MAL",
-                url=manga.sites_urls.mal.encoded_string(),
+                url=manga.sites_urls.mal,
             ),
         ]
 

@@ -35,7 +35,17 @@ class ValidationError(HoshikoError):
     pass
 
 
-class HostValidationError(HoshikoError):
+class URLValidationError(ValidationError):
+    pass
+
+
+class HTTPUrlValidationError(URLValidationError):
+    def __init__(self, obtained_url: str) -> None:
+        msg = f"Invalid URL: expected HTTP or HTTPS, got '{obtained_url}'"
+        super().__init__(msg)
+
+
+class HostValidationError(URLValidationError):
     def __init__(self, expected_host: str, actual_host: str) -> None:
         msg = f"Invalid host URL: expected '{expected_host}', got '{actual_host}'"
         super().__init__(msg)

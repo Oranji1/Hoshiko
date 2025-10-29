@@ -1,4 +1,4 @@
 from .urls import clean_anidb_url
-from .validation import check_host, host_url_validator
+from .validation import http_url_validator
 
-__all__ = ["check_host", "clean_anidb_url", "host_url_validator"]
+__all__ = ["clean_anidb_url", "http_url_validator"]

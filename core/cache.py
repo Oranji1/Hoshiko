@@ -4,10 +4,11 @@ import uuid
 from typing import TYPE_CHECKING
 
 from cachetools import LRUCache
+from msgspec import structs
 from rapidfuzz import fuzz, process
 
 if TYPE_CHECKING:
-    from core.models import Anime, Manga
+    from core.structs import Anime, Manga
 
 
 def make_uuid() -> str:
@@ -45,21 +46,16 @@ class CacheManager:  # Yes, this is horrible, I know
         for k in to_remove:
             del title_cache[k]
 
-    def add(self, cache_type: str, model: Anime | Manga) -> str:
+    def add(self, cache_type: str, struct: Anime | Manga) -> str:
         self._ensure_cache(cache_type)
 
         cache_id = make_uuid()
-        self.main_caches[cache_type][cache_id] = model.model_dump()
+        self.main_caches[cache_type][cache_id] = structs.asdict(struct)
 
         title_cache = self.title_caches[cache_type]
 
-        for title in model.alt_titles.values():
-            if title not in title_cache:
-                title_cache[title.lower()] = cache_id
-
-        for synonym in model.synonyms:
-            if synonym not in title_cache:
-                title_cache[synonym.lower()] = cache_id
+        for title in struct.titles:
+            title_cache[title["title"].lower()] = cache_id
 
         return cache_id
 
