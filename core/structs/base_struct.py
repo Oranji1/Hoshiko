@@ -10,7 +10,7 @@ class BaseStruct(Struct, frozen=True):
     pass
 
 
-class BaseMediaStruct(Struct, frozen=True, kw_only=True):
+class BaseMediaStruct(BaseStruct, kw_only=True):
     title: str
     synopsis: str | None = "N/A"
     cover_url: str | None = None
