@@ -7,7 +7,6 @@ requires-python = ">=3.12"
 dependencies = [
     "cachetools>=6.2.0",
     "discord>=2.3.2",
-    "jikanpy-v4>=1.0.2",
     "jishaku>=2.6.0",
     "msgspec>=0.19.0",
     "niquests>=3.15.2",
@@ -27,6 +26,7 @@ preview = true
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
+    "A002",
     "ASYNC240", # I don't like trio/anyio
     "C90", # Lol
     "COM812", # ruff format suggested
