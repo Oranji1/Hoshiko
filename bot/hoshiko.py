@@ -57,7 +57,7 @@ def setup_logger() -> logging.Logger:
 class Hoshiko(commands.Bot):
     def __init__(self) -> None:
         super().__init__(
-            command_prefix="h!",
+            command_prefix=config["bot"]["prefix"],
             intents=intents,
             help_command=None,
         )
