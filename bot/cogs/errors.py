@@ -1,3 +1,5 @@
+from logging import getLogger
+
 import discord
 from discord import Color
 from discord.ext import commands
@@ -6,14 +8,15 @@ from discord.ext.commands import Context
 from bot.hoshiko import Hoshiko
 from core.errors import APIError, NotFoundError
 
+logger = getLogger(__name__)
+
 
 class ErrorsCog(commands.Cog):
     def __init__(self, bot: Hoshiko) -> None:
         self.bot = bot
-        self.logger = self.bot.logger
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx: Context, error: Exception) -> None:
+    async def on_command_error(self, ctx: Context, error: Exception) -> None:  # noqa: PLR6301
         if isinstance(error, commands.CommandNotFound):
             return
 
@@ -30,7 +33,7 @@ class ErrorsCog(commands.Cog):
             error_embed.description = "I couldn't find that resource..."
             await ctx.reply(embed=error_embed)
         elif isinstance(original, APIError):
-            self.logger.error(
+            logger.error(
                 "An API error occurred in a command executed by %s (%s): %s",
                 ctx.author,
                 ctx.author.id,
@@ -40,7 +43,7 @@ class ErrorsCog(commands.Cog):
             error_embed.description = "Oops! There was an error trying to access that resource."
             await ctx.reply(embed=error_embed)
         else:
-            self.logger.error(
+            logger.error(
                 "An error occurred in a command executed by %s (%s): %s",
                 ctx.author,
                 ctx.author.id,
