@@ -4,7 +4,7 @@ import discord
 import jishaku
 from discord.ext import commands
 
-from bot.cogs import EXTENSIONS
+from bot.extensions import EXTENSIONS
 from core import CacheManager
 
 intents = discord.Intents().default()
