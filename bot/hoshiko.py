@@ -1,11 +1,10 @@
 import logging
-import os
-from pathlib import Path
 
 import discord
 import jishaku
 from discord.ext import commands
 
+from bot.cogs import EXTENSIONS
 from core import CacheManager
 
 intents = discord.Intents().default()
@@ -36,16 +35,18 @@ class Hoshiko(commands.Bot):
         self.config = config
         self.cm = CacheManager()
 
-    async def load_cogs(self) -> None:
-        for file in os.listdir(f"{os.path.realpath(Path(__file__).parent)}/cogs"):  # noqa: PTH208
-            if file.endswith(".py"):
-                extension = file[:-3]
-                await self.load_extension(f"bot.cogs.{extension}")
-                logger.info("Loaded extension '%s'", extension)
+    async def load_extensions(self) -> None:
+        for ext in EXTENSIONS:
+            try:
+                await self.load_extension(ext)
+            except Exception:
+                logger.exception("Failed to load extension '%s'", ext)
+            else:
+                logger.info("Loaded extension '%s'", ext)
 
     async def setup_hook(self) -> None:
         await self.load_extension("jishaku")
-        await self.load_cogs()
+        await self.load_extensions()
 
     async def start(self, token: str, *, reconnect: bool = True) -> None:
         await super().start(token, reconnect=reconnect)
