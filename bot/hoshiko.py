@@ -47,6 +47,3 @@ class Hoshiko(commands.Bot):
     async def setup_hook(self) -> None:
         await self.load_extension("jishaku")
         await self.load_extensions()
-
-    async def start(self, token: str, *, reconnect: bool = True) -> None:
-        await super().start(token, reconnect=reconnect)
