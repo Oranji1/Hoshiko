@@ -5,18 +5,18 @@ from typing import TYPE_CHECKING, Literal
 import discord
 from discord.ext import commands
 
-from core.services import search_anime
+from core.services import AnimeService
 
 if TYPE_CHECKING:
     from discord.ext.commands import Context
 
     from bot.hoshiko import Hoshiko
-    from core.structs import Anime
 
 
 class AnimeCog(commands.Cog):
     def __init__(self, bot: Hoshiko) -> None:
         self.bot = bot
+        self.service = AnimeService(bot.cm)
 
     @commands.command(name="anime")
     async def anime_command(
@@ -28,7 +28,7 @@ class AnimeCog(commands.Cog):
         msg = await ctx.reply(embed=embed, mention_author=False)
 
         check_cached = not dont_check_cached
-        anime: Anime = await search_anime(query, check_cached=check_cached, cache=self.bot.cm)
+        anime = await self.service.search(query, check_cached=check_cached)
 
         if not anime:
             embed.description = "Oops! I couldn't find that anime..."

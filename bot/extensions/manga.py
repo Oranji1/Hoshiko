@@ -5,18 +5,18 @@ from typing import TYPE_CHECKING, Literal
 import discord
 from discord.ext import commands
 
-from core.services import search_manga
+from core.services import MangaService
 
 if TYPE_CHECKING:
     from discord.ext.commands import Context
 
     from bot.hoshiko import Hoshiko
-    from core.structs import Manga
 
 
 class MangaCog(commands.Cog):
     def __init__(self, bot: Hoshiko) -> None:
         self.bot = bot
+        self.service = MangaService(bot.cm)
 
     @commands.command(name="manga")
     async def manga_command(
@@ -28,7 +28,7 @@ class MangaCog(commands.Cog):
         msg = await ctx.reply(embed=embed, mention_author=False)
 
         check_cached = not dont_check_cached
-        manga: Manga = await search_manga(query, check_cached=check_cached, cache=self.bot.cm)
+        manga = await self.service.search(query, check_cached=check_cached)
 
         if not manga:
             embed.description = "Oops! I couldn't find that manga..."
