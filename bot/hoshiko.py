@@ -6,6 +6,7 @@ from discord.ext import commands
 
 from bot.extensions import EXTENSIONS
 from core import CacheManager
+from core.config import Config
 
 intents = discord.Intents().default()
 intents.message_content = True
@@ -26,9 +27,9 @@ logger = logging.getLogger(__name__)
 
 
 class Hoshiko(commands.Bot):
-    def __init__(self, config: dict) -> None:
+    def __init__(self, config: Config) -> None:
         super().__init__(
-            command_prefix=config["bot"]["prefix"],
+            command_prefix=config.bot.prefix,
             intents=intents,
             help_command=None,
         )

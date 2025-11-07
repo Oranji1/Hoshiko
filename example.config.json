@@ -1,7 +1,0 @@
-{
-    "logging_level": "INFO",
-    "bot": {
-        "prefix": "h!",
-        "token": "YOUR_BOT_TOKEN_HERE"
-    }
-}

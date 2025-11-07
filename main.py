@@ -1,14 +1,8 @@
-import json
 from logging import getLevelName
-from pathlib import Path
 
 from bot.hoshiko import Hoshiko
+from core.config import load_config
 from core.utils import setup_logger
-
-with Path(f"{Path.cwd()}/config.json").open(encoding="utf-8") as file:
-    config = json.load(file)
-
-TOKEN = config["bot"]["token"]
 
 try:
     import uvloop
@@ -21,10 +15,11 @@ else:
 
 
 async def main() -> None:
-    setup_logger(getLevelName(config["logging_level"]))
+    config = load_config()
+    setup_logger(getLevelName(config.logging.level))
 
     async with Hoshiko(config) as bot:
-        await bot.start(TOKEN, reconnect=True)
+        await bot.start(config.bot.token, reconnect=True)
 
 
 if __name__ == "__main__":

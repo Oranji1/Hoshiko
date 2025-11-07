@@ -4,7 +4,7 @@ __pycache__/
 
 .ruff_cache/
 
-config.json
+config.toml
 .env
 *.log*
 logs/
