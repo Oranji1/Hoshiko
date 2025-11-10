@@ -16,13 +16,11 @@ async def make_anilist_request(json: dict, headers: dict) -> Response:
 
 
 async def search_anime(query: str) -> dict:
-    graphql_query = """query ($search: String!) {
-        Page(page: 1, perPage: 1) {
-            media(search: $search, type: ANIME) {
-                idMal
-                episodes
-                siteUrl
-            }
+    graphql_query = """query ($search: String) {
+        Media(search: $search, type: ANIME) {
+            idMal
+            episodes
+            siteUrl
         }
     }"""
 
@@ -34,14 +32,12 @@ async def search_anime(query: str) -> dict:
 
 
 async def search_manga(query: str) -> dict:
-    graphql_query = """query ($search: String!) {
-        Page(page: 1, perPage: 1) {
-            media(search: $search, type: MANGA) {
-                idMal
-                chapters
-                volumes
-                siteUrl
-            }
+    graphql_query = """query ($search: String) {
+        Media(search: $search, type: MANGA) {
+            idMal
+            chapters
+            volumes
+            siteUrl
         }
     }"""
 

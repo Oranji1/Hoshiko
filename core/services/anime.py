@@ -16,16 +16,12 @@ class AnimeService(BaseService):
             return convert(cached_anime, Anime)
 
         anilist_response = await search_anilist_anime(query)
-        media = anilist_response.get("data", {}).get("Page", {}).get("media", [])
+        anilist_data = anilist_response["data"]["Media"]
 
-        if not media:
-            raise NotFoundError(DATABASES.anilist, query)
-
-        anilist_data = media[0]
         mal_id = anilist_data.get("idMal")
 
         if not mal_id:
-            raise NotFoundError(DATABASES.anilist, query)
+            raise NotFoundError(DATABASES.anilist.name, query)
 
         mal_response = await get_mal_anime(mal_id)
         mal_data = mal_response.get("data")
