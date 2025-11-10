@@ -19,7 +19,6 @@ async def search_anime(query: str) -> dict:
     graphql_query = """query ($search: String) {
         Media(search: $search, type: ANIME) {
             idMal
-            episodes
             siteUrl
         }
     }"""
@@ -35,8 +34,6 @@ async def search_manga(query: str) -> dict:
     graphql_query = """query ($search: String) {
         Media(search: $search, type: MANGA) {
             idMal
-            chapters
-            volumes
             siteUrl
         }
     }"""
