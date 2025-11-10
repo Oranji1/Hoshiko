@@ -2,6 +2,7 @@ import logging
 
 import niquests
 
+from core.constants import APIS
 from core.errors import (
     BadRequestError,
     InternalServerError,
@@ -12,26 +13,25 @@ from core.errors import (
 
 logger = logging.getLogger(__name__)
 
-BASE_URL = "https://api.jikan.moe/v4/"
-
 
 async def make_jikan_request(cat: str, id: int, ext: str | None = None) -> niquests.Response:
-    url = f"{BASE_URL}/{cat}/{id}" + (f"/{ext}" if ext else "")
+    url = f"{APIS.jikan.base_url}/{cat}/{id}" + (f"/{ext}" if ext else "")
+    name = APIS.jikan.name
 
     async with niquests.AsyncSession() as session:
         res = await session.get(url)
         status = res.status_code
 
         if status == 400:
-            raise BadRequestError("Jikan")  # noqa: EM101
+            raise BadRequestError(name)
         elif status == 404:  # noqa: RET506
-            raise NotFoundError("Jikan", resource=f"{cat}/{id}")  # noqa: EM101
+            raise NotFoundError(name, resource=f"{cat}/{id}")
         elif status == 429:
-            raise RateLimitError("Jikan")  # noqa: EM101
+            raise RateLimitError(name)
         elif status == 500:
-            raise InternalServerError("Jikan")  # noqa: EM101
+            raise InternalServerError(name)
         elif status == 503:
-            raise ServiceUnavailableError("Jikan")  # noqa: EM101
+            raise ServiceUnavailableError(name)
 
         return res
 

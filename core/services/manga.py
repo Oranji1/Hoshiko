@@ -1,7 +1,8 @@
 from msgspec import convert
 
 from apis import get_mal_manga, search_anilist_manga
-from core.errors import APIError, ResourceNotFoundError, SearchNotFoundError
+from core.constants import DATABASES
+from core.errors import NotFoundError
 from core.structs import Manga, MangaPublicationInfo, MangaSitesURLs, MediaType, PublicationStatus
 
 from .abc import BaseService
@@ -13,26 +14,20 @@ class MangaService(BaseService):
         if cached_manga:
             return convert(cached_manga, Manga)
 
-        try:
-            anilist_response = await search_anilist_manga(query)
-            media = anilist_response.get("data", {}).get("Page", {}).get("media", [])
-        except Exception as e:
-            raise APIError("AniList", str(e)) from e  # noqa: EM101
+        anilist_response = await search_anilist_manga(query)
+        media = anilist_response.get("data", {}).get("Page", {}).get("media", [])
 
         if not media:
-            raise SearchNotFoundError(query, "AniList")
+            raise NotFoundError(DATABASES.anilist, query)
 
         anilist_data = media[0]
         mal_id = anilist_data.get("idMal")
 
         if not mal_id:
-            raise ResourceNotFoundError("idMal", "AniList", query)  # noqa: EM101
+            raise NotFoundError(DATABASES.anilist, query)
 
-        try:
-            mal_response = await get_mal_manga(mal_id)
-            mal_data = mal_response.get("data")
-        except Exception as e:
-            raise APIError("MyAnimeList", str(e)) from e  # noqa: EM101
+        mal_response = await get_mal_manga(mal_id)
+        mal_data = mal_response.get("data")
 
         sites_urls = MangaSitesURLs(anilist=anilist_data.get("siteUrl"), mal=mal_data["url"])
 

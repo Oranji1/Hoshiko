@@ -1,7 +1,8 @@
 from msgspec import convert
 
 from apis import get_mal_anime, search_anilist_anime
-from core.errors import APIError, ResourceNotFoundError, SearchNotFoundError
+from core.constants import DATABASES
+from core.errors import NotFoundError
 from core.structs import AiringStatus, Anime, AnimeAiringInfo, AnimeSitesURLs, MediaType, SourceType
 from core.utils import clean_anidb_url
 
@@ -14,26 +15,20 @@ class AnimeService(BaseService):
         if cached_anime:
             return convert(cached_anime, Anime)
 
-        try:
-            anilist_response = await search_anilist_anime(query)
-            media = anilist_response.get("data", {}).get("Page", {}).get("media", [])
-        except Exception as e:
-            raise APIError("AniList", str(e)) from e  # noqa: EM101
+        anilist_response = await search_anilist_anime(query)
+        media = anilist_response.get("data", {}).get("Page", {}).get("media", [])
 
         if not media:
-            raise SearchNotFoundError(query, "AniList")
+            raise NotFoundError(DATABASES.anilist, query)
 
         anilist_data = media[0]
         mal_id = anilist_data.get("idMal")
 
         if not mal_id:
-            raise ResourceNotFoundError("idMal", "AniList", query)  # noqa: EM101
+            raise NotFoundError(DATABASES.anilist, query)
 
-        try:
-            mal_response = await get_mal_anime(mal_id)
-            mal_data = mal_response.get("data")
-        except Exception as e:
-            raise APIError("MyAnimeList", str(e)) from e  # noqa: EM101
+        mal_response = await get_mal_anime(mal_id)
+        mal_data = mal_response.get("data")
 
         airing_info = AnimeAiringInfo(
             status=AiringStatus(mal_data["status"]), season=mal_data["season"]
