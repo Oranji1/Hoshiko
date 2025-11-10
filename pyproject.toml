@@ -31,7 +31,8 @@ ignore = [
     "C90", # Lol
     "COM812", # ruff format suggested
     "CPY001", # I hate this
-    "D" # Temporary ignore until 0.2, it would be annoying to document everything now
+    "D", # Temporary ignore until 0.2, it would be annoying to document everything now
+    "PLR2004", # Magic value comparisons, used for HTTP status comparisons
 ]
 unfixable = [
     "E501",  # Line length handled in other ways by ruff format
