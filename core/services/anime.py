@@ -18,20 +18,20 @@ class AnimeService(BaseService):
         anilist_response = await search_anilist_anime(query)
         anilist_data = anilist_response["data"]["Media"]
 
-        mal_id = anilist_data.get("idMal")
+        mal_id = anilist_data["idMal"]
 
         if not mal_id:
             raise NotFoundError(DATABASES.anilist.name, query)
 
         mal_response = await get_mal_anime(mal_id)
-        mal_data = mal_response.get("data")
+        mal_data = mal_response["data"]
 
         airing_info = AnimeAiringInfo(
             status=AiringStatus(mal_data["status"]), season=mal_data["season"]
         )
 
         urls_dict = {}
-        urls_dict["anilist"] = anilist_data.get("siteUrl")
+        urls_dict["anilist"] = anilist_data["siteUrl"]
         urls_dict["mal"] = mal_data["url"]
 
         for link_data in mal_data["external"]:
@@ -49,12 +49,12 @@ class AnimeService(BaseService):
         sites_urls = convert(urls_dict, AnimeSitesURLs)
 
         anime = Anime(
-            title=mal_data.get("title", "N/A"),
-            synopsis=mal_data.get("synopsis", "N/A"),
-            cover_url=mal_data["images"]["webp"].get("large_image_url"),
+            title=mal_data["title"],
+            synopsis=mal_data["synopsis"],
+            cover_url=mal_data["images"]["webp"]["large_image_url"],
             type=MediaType(mal_data["type"]),
             source=SourceType(mal_data.get("source", "OTHER")),
-            episodes=anilist_data.get("episodes"),
+            episodes=mal_data["episodes"],
             titles=mal_data["titles"],
             airing_info=airing_info,
             sites_urls=sites_urls,
