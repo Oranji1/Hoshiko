@@ -1,4 +1,18 @@
-import niquests
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from core.constants import APIS
+
+from ._session import AsyncSession
+
+if TYPE_CHECKING:
+    from niquests import Response
+
+
+async def make_anilist_request(json: dict, headers: dict) -> Response:
+    async with AsyncSession(APIS.anilist.name) as session:
+        return await session.post(APIS.anilist.base_url, json=json, headers=headers)
 
 
 async def search_anime(query: str) -> dict:
@@ -11,15 +25,12 @@ async def search_anime(query: str) -> dict:
             }
         }
     }"""
-    async with niquests.AsyncSession() as session:
-        variables = {"search": query}
-        response = await session.post(
-            url="https://graphql.anilist.co",
-            json={"query": graphql_query, "variables": variables},
-            headers={"Content-Type": "application/json", "Accept": "application/json"},
-        )
 
-        return response.json()
+    res = await make_anilist_request(
+        json={"query": graphql_query, "variables": {"search": query}},
+        headers={"Content-Type": "application/json", "Accept": "application/json"},
+    )
+    return res.json()
 
 
 async def search_manga(query: str) -> dict:
@@ -33,12 +44,9 @@ async def search_manga(query: str) -> dict:
             }
         }
     }"""
-    async with niquests.AsyncSession() as session:
-        variables = {"search": query}
-        response = await session.post(
-            url="https://graphql.anilist.co",
-            json={"query": graphql_query, "variables": variables},
-            headers={"Content-Type": "application/json", "Accept": "application/json"},
-        )
 
-        return response.json()
+    res = await make_anilist_request(
+        json={"query": graphql_query, "variables": {"search": query}},
+        headers={"Content-Type": "application/json", "Accept": "application/json"},
+    )
+    return res.json()

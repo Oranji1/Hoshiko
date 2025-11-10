@@ -1,39 +1,23 @@
-import logging
+from __future__ import annotations
 
-import niquests
+import logging
+from typing import TYPE_CHECKING
 
 from core.constants import APIS
-from core.errors import (
-    BadRequestError,
-    InternalServerError,
-    NotFoundError,
-    RateLimitError,
-    ServiceUnavailableError,
-)
+
+from ._session import AsyncSession
+
+if TYPE_CHECKING:
+    from niquests import Response
 
 logger = logging.getLogger(__name__)
 
 
-async def make_jikan_request(cat: str, id: int, ext: str | None = None) -> niquests.Response:
+async def make_jikan_request(cat: str, id: int, ext: str | None = None) -> Response:
     url = f"{APIS.jikan.base_url}/{cat}/{id}" + (f"/{ext}" if ext else "")
-    name = APIS.jikan.name
 
-    async with niquests.AsyncSession() as session:
-        res = await session.get(url)
-        status = res.status_code
-
-        if status == 400:
-            raise BadRequestError(name)
-        elif status == 404:  # noqa: RET506
-            raise NotFoundError(name, resource=f"{cat}/{id}")
-        elif status == 429:
-            raise RateLimitError(name)
-        elif status == 500:
-            raise InternalServerError(name)
-        elif status == 503:
-            raise ServiceUnavailableError(name)
-
-        return res
+    async with AsyncSession(APIS.jikan.name) as session:
+        return await session.get(url)
 
 
 async def get_anime(id: int) -> dict:

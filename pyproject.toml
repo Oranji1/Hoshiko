@@ -27,12 +27,15 @@ preview = true
 select = ["ALL"]
 ignore = [
     "A002",
+    "ANN002", # Annotating *args and **kwargs in this codebase is usually just dumb
+    "ANN003",
     "ASYNC240", # I don't like trio/anyio
     "C90", # Lol
     "COM812", # ruff format suggested
     "CPY001", # I hate this
     "D", # Temporary ignore until 0.2, it would be annoying to document everything now
     "PLR2004", # Magic value comparisons, used for HTTP status comparisons
+    "TD",
 ]
 unfixable = [
     "E501",  # Line length handled in other ways by ruff format
