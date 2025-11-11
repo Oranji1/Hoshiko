@@ -41,7 +41,9 @@ class ColorFormatter(logging.Formatter):
         return output
 
 
-def setup_logger(level: int | None = logging.INFO) -> None:
+def setup_logger(
+    level: int | None = logging.INFO, max_mib: int = 32, backup_count: int = 5
+) -> None:
     logger = logging.getLogger()
     logger.setLevel(level)
 
@@ -57,8 +59,8 @@ def setup_logger(level: int | None = logging.INFO) -> None:
 
     file_handler = RotatingFileHandler(
         LOG_DIR / "hoshiko.log",
-        maxBytes=32 * 1024 * 1024,
-        backupCount=5,
+        maxBytes=max_mib * 1024 * 1024,
+        backupCount=backup_count,
         encoding="utf-8",
     )
     file_handler.setFormatter(fmt)

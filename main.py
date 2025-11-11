@@ -15,8 +15,12 @@ else:
 
 
 async def main() -> None:
-    config = load_config()
-    setup_logger(getLevelName(config.logging.level))
+    config = load_config("config.toml")
+    setup_logger(
+        level=getLevelName(config.logging.level),
+        max_mib=config.logging.file_max_mib,
+        backup_count=config.logging.file_backup_count,
+    )
 
     async with Hoshiko(config) as bot:
         await bot.start(config.bot.token, reconnect=True)
