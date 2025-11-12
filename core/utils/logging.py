@@ -47,6 +47,9 @@ def setup_logger(
     logger = logging.getLogger()
     logger.setLevel(level)
 
+    logging.getLogger("discord").setLevel(logging.WARNING)
+    logging.getLogger("discord.client").setLevel(logging.INFO)
+
     fmt = logging.Formatter(
         "[%(asctime)s] [%(levelname)-8s] %(name)s: %(message)s",
         "%Y-%m-%d %H:%M:%S",
