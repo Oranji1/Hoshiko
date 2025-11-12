@@ -9,10 +9,11 @@ from ._session import AsyncSession
 if TYPE_CHECKING:
     from niquests import Response
 
+anilist_session = AsyncSession(APIS.anilist.name, max_calls=30, period=60.0)
+
 
 async def make_anilist_request(json: dict, headers: dict) -> Response:
-    async with AsyncSession(APIS.anilist.name) as session:
-        return await session.post(APIS.anilist.base_url, json=json, headers=headers)
+    return await anilist_session.post(APIS.anilist.base_url, json=json, headers=headers)
 
 
 async def search_anime(query: str) -> dict:

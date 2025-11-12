@@ -12,12 +12,13 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+jikan_session = AsyncSession(APIS.jikan.name, max_calls=90, period=90.0)
+
 
 async def make_jikan_request(cat: str, id: int, ext: str | None = None) -> Response:
     url = f"{APIS.jikan.base_url}/{cat}/{id}" + (f"/{ext}" if ext else "")
 
-    async with AsyncSession(APIS.jikan.name) as session:
-        return await session.get(url)
+    return await jikan_session.get(url)
 
 
 async def get_anime(id: int) -> dict:
